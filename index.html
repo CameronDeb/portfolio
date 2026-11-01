@@ -261,6 +261,11 @@
             <a href="https://www.deboughsystems.com/" target="_blank" rel="noopener noreferrer">DeBough Systems</a>,
             a security monitoring product for businesses without IT staff.
         </p>
+        <p>
+            In October 2026 I presented a poster on
+            <a href="/turtlebot-gaussian-slam.html">Gaussian Splatting SLAM on a TurtleBot 4</a>
+            at the Bay Area Robotics Symposium at UC Berkeley.
+        </p>
         <p>I'm looking for software engineering internships for Summer 2027.</p>
     </div>
 
@@ -319,9 +324,39 @@
             <p class="org">VSI Lab, University of Arizona ECE</p>
             <p class="note">Embodied AI and accessibility. Advisor: Prof. Eungjoo Lee</p>
             <ul>
-                <li>Building 3D reconstruction (Gaussian splatting) and NVIDIA Isaac Sim environments for robot inspection, with ROS 2 control of LeRobot SO-101 arms and TurtleBot4 navigation.</li>
-                <li>Building computer-vision pipelines for Meta Aria 2 smart glasses (hand tracking, gaze data, real-time on-device ML inference) for ASL accessibility and skill-assessment applications.</li>
+                <li>Led a real-robot study of online Gaussian Splatting SLAM (MonoGS) on a TurtleBot 4, compared against offline structure-from-motion (COLMAP and GLOMAP + 3DGS). Online mapping took 2.4 min, versus 6.8 min for COLMAP and 4.0 min for GLOMAP, with comparable image quality.</li>
+                <li>Built the ROS 2 pipeline from rosbag2 recording on the robot through SLAM and SfM runs to evaluation: trajectory error (ATE against a lidar SLAM reference) and rendering quality (PSNR, SSIM, LPIPS).</li>
+                <li>Found that the OAK-D depth camera reads 11 to 13% long. Correcting it with the lidar cut SLAM tracking error from 7.4 cm to 1.2 cm.</li>
+                <li>Also building NVIDIA Isaac Sim environments, ROS 2 control of LeRobot SO-101 arms, and computer-vision pipelines for Meta Aria 2 smart glasses (hand tracking, gaze data, real-time on-device ML inference) for ASL accessibility and skill assessment.</li>
             </ul>
+            <div class="entry-links">
+                <a href="/turtlebot-gaussian-slam.html">Project page</a>
+                <a href="https://github.com/vsi-lab/turtlebot-gaussian-slam" target="_blank" rel="noopener noreferrer">Code</a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Presentations &amp; Awards</h2>
+
+        <div class="entry">
+            <div class="entry-head">
+                <h3>Bay Area Robotics Symposium (BARS 2026)</h3>
+                <span class="date">Oct 2026</span>
+            </div>
+            <p class="org">Poster, UC Berkeley</p>
+            <p class="desc"><em>Online Gaussian Splatting SLAM on a TurtleBot4: Real-Robot Evaluation Against Offline Structure-from-Motion.</em> Cameron DeBough, Wonhee Koh, Eungjoo Lee.</p>
+            <div class="entry-links">
+                <a href="/turtlebot-gaussian-slam.html">Project page</a>
+            </div>
+        </div>
+
+        <div class="entry">
+            <div class="entry-head">
+                <h3>Undergraduate Research Travel Grant</h3>
+                <span class="date">Fall 2026</span>
+            </div>
+            <p class="org">$1,000 · Office of Undergraduate Research and Scholar Development, University of Arizona</p>
         </div>
     </section>
 
@@ -413,10 +448,10 @@
             <dd>Python, C++, Java, JavaScript/TypeScript, SQL, MATLAB, Bash, HTML/CSS</dd>
             <dt>Frameworks</dt>
             <dd>FastAPI, Flask, React, Next.js, Node.js, Tailwind CSS</dd>
-            <dt>Embedded &amp; hardware</dt>
-            <dd>Raspberry Pi, I²C sensors, PWM servo control, VISA/SCPI instrument automation, ROS 2</dd>
+            <dt>Robotics &amp; hardware</dt>
+            <dd>ROS 2, SLAM, Gaussian splatting, COLMAP, NVIDIA Isaac Sim, Raspberry Pi, I²C sensors, PWM servo control, VISA/SCPI instrument automation</dd>
             <dt>Data &amp; ML</dt>
-            <dd>NumPy, SciPy, Pandas, signal processing (FFT, SVD), computer vision, LLM integration</dd>
+            <dd>PyTorch, NumPy, SciPy, Pandas, signal processing (FFT, SVD), computer vision, LLM integration</dd>
             <dt>Tools &amp; databases</dt>
             <dd>Git, Docker, Linux, PostgreSQL, Supabase, Stripe, CI/CD</dd>
         </dl>

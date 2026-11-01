@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaussian Splatting SLAM on a TurtleBot 4 · Cameron DeBough</title>
+    <meta name="description" content="Online Gaussian Splatting SLAM on a TurtleBot 4, evaluated against offline structure-from-motion. Poster at the Bay Area Robotics Symposium (BARS 2026), UC Berkeley.">
+    <meta property="og:title" content="Gaussian Splatting SLAM on a TurtleBot 4">
+    <meta property="og:description" content="Real-robot evaluation of online Gaussian Splatting SLAM against offline structure-from-motion. Poster at BARS 2026, UC Berkeley.">
+    <meta property="og:url" content="https://www.camerondebough.com/turtlebot-gaussian-slam.html">
+    <meta property="og:type" content="article">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #fbfbf9;
+            --text: #1b1b1a;
+            --muted: #5d5d59;
+            --faint: #8a8a85;
+            --rule: #e3e3de;
+            --link: #1f4fd1;
+            --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121211;
+                --text: #e8e8e4;
+                --muted: #a6a6a0;
+                --faint: #7e7e79;
+                --rule: #2b2b28;
+                --link: #91b1ff;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 16px/1.6 var(--font);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 56px 24px 56px;
+        }
+
+        a { color: var(--link); text-decoration: none; }
+        a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+        .back { font-size: 0.92rem; }
+
+        h1 {
+            margin: 28px 0 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+        }
+
+        .meta {
+            margin: 8px 0 0;
+            color: var(--muted);
+        }
+
+        .authors {
+            margin: 2px 0 0;
+            font-size: 0.92rem;
+            color: var(--faint);
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 18px;
+            margin: 14px 0 0;
+            font-size: 0.95rem;
+        }
+
+        section { margin-top: 44px; }
+
+        h2 {
+            margin: 0 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--rule);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--faint);
+        }
+
+        p { margin: 0 0 14px; }
+
+        ul { margin: 0; padding-left: 1.15em; }
+        li { margin: 6px 0; }
+        li::marker { color: var(--faint); }
+
+        figure { margin: 20px 0; }
+
+        figure img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+        }
+
+        figcaption {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--faint);
+        }
+
+        .stack {
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--faint);
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 64px;
+            padding-top: 18px;
+            border-top: 1px solid var(--rule);
+            font-size: 0.85rem;
+            color: var(--faint);
+        }
+
+        @media (max-width: 560px) {
+            main { padding: 36px 18px 44px; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<main>
+
+    <a class="back" href="/">&larr; Cameron DeBough</a>
+
+    <h1>Online Gaussian Splatting SLAM on a TurtleBot 4</h1>
+    <p class="meta">VSI Lab, University of Arizona · Poster at the Bay Area Robotics Symposium (BARS 2026), UC Berkeley, October 30, 2026</p>
+    <p class="authors">Cameron DeBough, Wonhee Koh, Eungjoo Lee</p>
+    <div class="links">
+        <a href="https://github.com/vsi-lab/turtlebot-gaussian-slam" target="_blank" rel="noopener noreferrer">Code</a>
+        <a href="https://vsilab.github.io" target="_blank" rel="noopener noreferrer">VSI Lab</a>
+        <!-- <a href="/turtlebot-gs/BARS2026_poster.pdf" target="_blank" rel="noopener noreferrer">Poster (PDF)</a> -->
+    </div>
+
+    <!--
+    <figure>
+        <img src="/turtlebot-gs/poster-preview.png" alt="BARS 2026 poster: Online Gaussian Splatting SLAM on a TurtleBot4">
+        <figcaption>The poster I presented at BARS 2026.</figcaption>
+    </figure>
+    -->
+
+    <section>
+        <h2>Overview</h2>
+        <p>
+            Photorealistic 3D maps made with Gaussian splatting are usually built offline: record the
+            images, run structure-from-motion (COLMAP or GLOMAP) to recover camera poses, then train the map.
+            I wanted to know whether a robot could build that kind of map while it drives, and how it holds up
+            against the offline approach on real hardware.
+        </p>
+        <p>
+            I ran MonoGS, an RGB-D Gaussian Splatting SLAM method from CVPR 2024, on a TurtleBot 4
+            (iRobot Create 3 base, Raspberry Pi 4, OAK-D Pro RGB-D camera, RPLIDAR) mapping an indoor room,
+            and compared it with COLMAP + 3DGS and GLOMAP + 3DGS on the same recordings.
+        </p>
+    </section>
+
+    <!--
+    <figure>
+        <img src="/turtlebot-gs/robot.jpg" alt="TurtleBot 4 with OAK-D Pro camera and RPLIDAR">
+        <figcaption>The TurtleBot 4 used for every run.</figcaption>
+    </figure>
+    -->
+
+    <section>
+        <h2>What I did</h2>
+        <p>I led the project. Specifically, I:</p>
+        <ul>
+            <li>Ran the robot experiments and recorded ROS 2 bags on the robot.</li>
+            <li>Built the pipeline that turns those bags into datasets, runs SLAM and structure-from-motion, and scores the results: trajectory accuracy (ATE with Umeyama alignment, using lidar SLAM from slam_toolbox as the reference) and rendering quality (PSNR, SSIM, LPIPS).</li>
+            <li>Tracked down a depth error in the OAK-D camera and corrected it using the lidar.</li>
+            <li>Prototyped a revisit planner that picks where the robot should go back to re-observe so the map improves.</li>
+            <li>Ran simulations in NVIDIA Isaac Sim.</li>
+            <li>Designed the poster.</li>
+        </ul>
+    </section>
+
+    <!--
+    <figure>
+        <img src="/turtlebot-gs/pipeline.png" alt="Pipeline from ROS 2 bag recording to SLAM, structure-from-motion, and evaluation">
+        <figcaption>From robot recording to evaluation.</figcaption>
+    </figure>
+    -->
+
+    <section>
+        <h2>Results</h2>
+        <ul>
+            <li><strong>The depth camera reads long.</strong> The OAK-D depth was 11 to 13% too long. After modeling and correcting that error against the lidar, MonoGS tracking error (ATE) dropped from 7.4 cm to 1.2 cm.</li>
+            <li><strong>Online mapping was faster.</strong> On a 1.8 m route, MonoGS mapped online in 2.4 min (31.0 dB PSNR). The offline pipelines took 6.8 min (COLMAP + 3DGS) and 4.0 min (GLOMAP + 3DGS, 29.7 dB PSNR), so mapping online was faster with comparable image quality.</li>
+        </ul>
+    </section>
+
+    <!--
+    <figure>
+        <img src="/turtlebot-gs/map-renders.png" alt="Renders of the Gaussian splatting maps from MonoGS and offline structure-from-motion">
+        <figcaption>Map renders: online (MonoGS) vs. offline (COLMAP / GLOMAP + 3DGS).</figcaption>
+    </figure>
+    <figure>
+        <img src="/turtlebot-gs/trajectories.png" alt="Estimated trajectories compared with the lidar reference">
+        <figcaption>Estimated trajectories against the lidar SLAM reference.</figcaption>
+    </figure>
+    -->
+
+    <section>
+        <h2>Next</h2>
+        <p>
+            I'm extending this into a study, targeting IROS 2027, on when revisiting a spot actually improves an
+            indoor Gaussian map when depth is unreliable and the robot can only travel so far.
+        </p>
+    </section>
+
+    <!--
+    <figure>
+        <img src="/turtlebot-gs/presenting.jpg" alt="Cameron DeBough presenting the poster at BARS 2026">
+        <figcaption>Presenting at BARS 2026, Pauley Ballroom, UC Berkeley.</figcaption>
+    </figure>
+    -->
+
+    <section>
+        <h2>Tools</h2>
+        <p class="stack">ROS 2 Jazzy · Python · PyTorch/CUDA · MonoGS · COLMAP · GLOMAP · 3D Gaussian Splatting · slam_toolbox · rosbag2 · NVIDIA Isaac Sim · Linux/WSL2</p>
+    </section>
+
+    <footer>
+        <a href="/">&larr; Back to home</a>
+        <a href="mailto:cameron.debough@gmail.com">cameron.debough@gmail.com</a>
+    </footer>
+
+</main>
+</body>
+</html>
